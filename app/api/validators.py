@@ -6,10 +6,10 @@ from app.models.charity_project import CharityProject
 
 
 async def check_name_duplicate(
-    project_name: str, session: AsyncSession
+    project_name: str, session: AsyncSession, exclude_id: int | None = None
 ) -> None:
     project_id = await charity_project_crud.get_project_id_by_name(
-        project_name, session
+        project_name, session, exclude_id=exclude_id
     )
     if project_id is not None:
         raise HTTPException(
@@ -74,4 +74,6 @@ async def check_invested_amount_before_update(
         )
 
     if "name" in update_data:
-        await check_name_duplicate(update_data["name"], session)
+        await check_name_duplicate(
+            update_data["name"], session, exclude_id=charity_project.id
+        )

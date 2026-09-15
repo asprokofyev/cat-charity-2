@@ -33,18 +33,25 @@ class CRUDBase:
         db_objs = await session.execute(select(self.model))
         return db_objs.scalars().all()
 
-    async def create(self, obj_in, session: AsyncSession):
+    async def create(
+        self, obj_in, session: AsyncSession, commit: bool = True
+    ):
         if isinstance(obj_in, dict):
             obj_in_data = obj_in
         else:
             obj_in_data = obj_in.model_dump()
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
-        await session.commit()
+        if commit:
+            await session.commit()
+        else:
+            await session.flush()
         await session.refresh(db_obj)
         return db_obj
 
-    async def update(self, db_obj, obj_in, session: AsyncSession):
+    async def update(
+        self, db_obj, obj_in, session: AsyncSession, commit: bool = True
+    ):
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -55,7 +62,10 @@ class CRUDBase:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
         session.add(db_obj)
-        await session.commit()
+        if commit:
+            await session.commit()
+        else:
+            await session.flush()
         await session.refresh(db_obj)
         return db_obj
 

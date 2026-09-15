@@ -49,9 +49,10 @@ async def create_charity_project(
     await check_name_duplicate(charity_project.name, session)
 
     db_project = await charity_project_crud.create(
-        charity_project.model_dump(), session
+        charity_project.model_dump(), session, commit=False
     )
     await invest(session, db_project)
+    await session.commit()
     await session.refresh(db_project)
     return db_project
 

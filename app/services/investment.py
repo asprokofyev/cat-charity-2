@@ -64,4 +64,4 @@ async def invest(
                 target.fully_invested = True
                 target.close_date = datetime.now()  # type: ignore
 
-    await session.commit()
+    await session.flush()

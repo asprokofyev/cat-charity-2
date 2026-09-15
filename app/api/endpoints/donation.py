@@ -55,7 +55,10 @@ async def create_donation(
 ):
     donation_data = donation.model_dump()
     donation_data['user_id'] = user.id
-    db_donation = await donation_crud.create(donation_data, session)
+    db_donation = await donation_crud.create(
+        donation_data, session, commit=False
+    )
     await invest(session, db_donation)
+    await session.commit()
     await session.refresh(db_donation)
     return db_donation
